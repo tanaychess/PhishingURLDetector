@@ -1,0 +1,41 @@
+sample_id,ground_truth,predicted_label,phishing_probability,feature,feature_value,shap_value,contribution_direction
+0,Phishing,Phishing,0.9861,directory_length,46.0,0.99233,Increases Phishing Risk
+0,Phishing,Phishing,0.9861,length_url,73.0,0.99003,Increases Phishing Risk
+0,Phishing,Phishing,0.9861,qty_slash_url,4.0,0.82362,Increases Phishing Risk
+0,Phishing,Phishing,0.9861,time_domain_activation,-1.0,0.4858,Increases Phishing Risk
+0,Phishing,Phishing,0.9861,time_response,0.287485,0.24249,Increases Phishing Risk
+0,Phishing,Phishing,0.9861,ttl_hostname,241.0,-0.28514,Decreases Phishing Risk (Legitimate Signal)
+0,Phishing,Phishing,0.9861,qty_dot_domain,2.0,-0.19617,Decreases Phishing Risk (Legitimate Signal)
+0,Phishing,Phishing,0.9861,tls_ssl_certificate,1.0,-0.08456,Decreases Phishing Risk (Legitimate Signal)
+0,Phishing,Phishing,0.9861,qty_params,1.0,-0.08132,Decreases Phishing Risk (Legitimate Signal)
+0,Phishing,Phishing,0.9861,asn_ip,15169.0,-0.07575,Decreases Phishing Risk (Legitimate Signal)
+5,Legitimate,Legitimate,0.0038,time_response,0.389633,0.10483,Increases Phishing Risk
+5,Legitimate,Legitimate,0.0038,tls_ssl_certificate,0.0,0.07264,Increases Phishing Risk
+5,Legitimate,Legitimate,0.0038,domain_length,24.0,0.07248,Increases Phishing Risk
+5,Legitimate,Legitimate,0.0038,qty_nameservers,2.0,0.05712,Increases Phishing Risk
+5,Legitimate,Legitimate,0.0038,qty_ip_resolved,1.0,0.01857,Increases Phishing Risk
+5,Legitimate,Legitimate,0.0038,time_domain_activation,5208.0,-1.67234,Decreases Phishing Risk (Legitimate Signal)
+5,Legitimate,Legitimate,0.0038,directory_length,-1.0,-1.55036,Decreases Phishing Risk (Legitimate Signal)
+5,Legitimate,Legitimate,0.0038,qty_slash_url,0.0,-1.44973,Decreases Phishing Risk (Legitimate Signal)
+5,Legitimate,Legitimate,0.0038,length_url,24.0,-0.41851,Decreases Phishing Risk (Legitimate Signal)
+5,Legitimate,Legitimate,0.0038,qty_dot_domain,2.0,-0.23583,Decreases Phishing Risk (Legitimate Signal)
+12,Phishing,Phishing,0.9849,directory_length,38.0,1.18563,Increases Phishing Risk
+12,Phishing,Phishing,0.9849,qty_dot_domain,1.0,0.9058,Increases Phishing Risk
+12,Phishing,Phishing,0.9849,qty_slash_url,5.0,0.86578,Increases Phishing Risk
+12,Phishing,Phishing,0.9849,length_url,56.0,0.54252,Increases Phishing Risk
+12,Phishing,Phishing,0.9849,time_domain_activation,676.0,0.46744,Increases Phishing Risk
+12,Phishing,Phishing,0.9849,qty_redirects,2.0,-0.24073,Decreases Phishing Risk (Legitimate Signal)
+12,Phishing,Phishing,0.9849,ttl_hostname,442.0,-0.17247,Decreases Phishing Risk (Legitimate Signal)
+12,Phishing,Phishing,0.9849,tls_ssl_certificate,1.0,-0.07316,Decreases Phishing Risk (Legitimate Signal)
+12,Phishing,Phishing,0.9849,domain_spf,0.0,-0.04396,Decreases Phishing Risk (Legitimate Signal)
+12,Phishing,Phishing,0.9849,time_domain_expiration,53.0,-0.0425,Decreases Phishing Risk (Legitimate Signal)
+42,Phishing,Phishing,0.9974,length_url,92.0,0.95421,Increases Phishing Risk
+42,Phishing,Phishing,0.9974,qty_slash_url,5.0,0.87251,Increases Phishing Risk
+42,Phishing,Phishing,0.9974,directory_length,32.0,0.86548,Increases Phishing Risk
+42,Phishing,Phishing,0.9974,qty_dot_domain,1.0,0.79215,Increases Phishing Risk
+42,Phishing,Phishing,0.9974,qty_dot_params,2.0,0.35494,Increases Phishing Risk
+42,Phishing,Phishing,0.9974,qty_params,1.0,-0.13474,Decreases Phishing Risk (Legitimate Signal)
+42,Phishing,Phishing,0.9974,tls_ssl_certificate,1.0,-0.07703,Decreases Phishing Risk (Legitimate Signal)
+42,Phishing,Phishing,0.9974,domain_spf,0.0,-0.03929,Decreases Phishing Risk (Legitimate Signal)
+42,Phishing,Phishing,0.9974,qty_tld_url,1.0,-0.0321,Decreases Phishing Risk (Legitimate Signal)
+42,Phishing,Phishing,0.9974,qty_hyphen_domain,0.0,-0.00661,Decreases Phishing Risk (Legitimate Signal)
