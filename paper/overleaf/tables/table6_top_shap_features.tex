@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\caption{Top 10 Most Influential Features Ranked by Mean Absolute TreeSHAP Value on Training Partition}
+\label{tab:shap_features}
+\centering
+\begin{tabular}{clccp{10.5cm}}
+\hline
+\textbf{Rank} & \textbf{Feature Identifier} & \textbf{Modality} & \textbf{Mean $|\text{SHAP}|$} & \textbf{Plausible Cybersecurity Interpretation} \\
+\hline
+1 & \texttt{directory\_length} & Lexical & 1.0811 & Directory path length / presence (deep nesting often masks fraud; $-1$ indicates no path) \\
+2 & \texttt{time\_domain\_activation} & Network & 0.9912 & Domain age in days (new domains and failed lookups often correlate with throwaway setups) \\
+3 & \texttt{qty\_slash\_url} & Lexical & 0.7377 & Forward slash delimiter count across URL hierarchy \\
+4 & \texttt{length\_url} & Lexical & 0.7222 & Raw URL character length (often used to obscure destination) \\
+5 & \texttt{qty\_dot\_domain} & Lexical & 0.5293 & Subdomain dot count (frequently used in multi-level brand spoofing) \\
+6 & \texttt{ttl\_hostname} & Network & 0.3147 & DNS TTL metric (short TTLs are consistent with fast-flux evasive DNS) \\
+7 & \texttt{asn\_ip} & Network & 0.2057 & Autonomous System Number (differentiates bulletproof/rogue hosting ASNs) \\
+8 & \texttt{time\_response} & Network & 0.1724 & HTTP response latency in seconds (reflects temporary host variability) \\
+9 & \texttt{qty\_hyphen\_directory} & Lexical & 0.1277 & Hyphens in directory path (often inserted to mimic brand keywords) \\
+10 & \texttt{qty\_redirects} & Network & 0.1082 & HTTP redirection hop count (multi-hop chains obscure destination landing) \\
+\hline
+\end{tabular}
+\end{table*}

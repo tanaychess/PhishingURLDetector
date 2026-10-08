@@ -1,0 +1,25 @@
+\begin{table*}[t]
+\caption{Impact of Feature Reduction and Computational Profile (Test Set: $N=11,729$)}
+\label{tab:feature_selection_resources}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccccr}
+\hline
+\textbf{Configuration} & \textbf{Net / Lex} & \textbf{Acc (\%)} & \textbf{F1 (\%)} & \textbf{ROC-AUC} & \textbf{Lat (ms / $10^3$ URLs)} & \textbf{Size (MB)} & \textbf{Throughput (q/s)} \\
+\hline
+XGBoost (Full 98) & 14N / 84L & 94.82 & 95.05 & 0.9879 & 2.46 $\pm$ 0.20 & 0.126 & 406,318 \\
+XGBoost (Top-30) & 12N / 18L & 94.74 & 94.97 & 0.9882 & 1.83 $\pm$ 0.07 & 0.134 & 546,448 \\
+\textbf{XGBoost (Top-20)} & \textbf{11N / 9L} & \textbf{94.82} & \textbf{95.05} & \textbf{0.9876} & \textbf{1.67 $\pm$ 0.06} & \textbf{0.130} & \textbf{600,099} \\
+XGBoost (Top-10) & 5N / 5L & 94.19 & 94.48 & 0.9859 & 1.57 $\pm$ 0.11 & 0.126 & 636,942 \\
+XGBoost (Top-5) & 1N / 4L & 91.32 & 91.84 & 0.9723 & 1.59 $\pm$ 0.12 & 0.121 & 628,930 \\
+\textbf{XGBoost (Lexical-84)} & \textbf{0N / 84L} & \textbf{89.68} & \textbf{90.04} & \textbf{0.9627} & \textbf{3.16 $\pm$ 0.43} & \textbf{0.342} & \textbf{316,002} \\
+\hline
+Random Forest & 14N / 84L & 94.30 & 94.57 & 0.9867 & 10.60 $\pm$ 0.31 & 4.068 & 94,369 \\
+Decision Tree & 14N / 84L & 93.61 & 93.92 & 0.9668 & 0.53 $\pm$ 0.05 & 0.029 & 1,884,868 \\
+Linear SVM & 14N / 84L & 89.99 & 90.58 & 0.9613 & 2.85 $\pm$ 0.20 & 0.006 & 350,920 \\
+Logistic Regression & 14N / 84L & 89.97 & 90.55 & 0.9613 & 1.41 $\pm$ 0.16 & 0.004 & 708,898 \\
+\hline
+\multicolumn{8}{l}{\footnotesize * Evaluated under random seed 42. Multi-seed test evaluation for Top-20 (5 seeds) yields $94.71\% \pm 0.09\%$ Acc and $94.95\% \pm 0.08\%$ F1.} \\
+\end{tabular}
+}
+\end{table*}

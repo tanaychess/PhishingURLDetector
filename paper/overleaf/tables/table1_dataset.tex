@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\caption{Dataset Specification and Partitioning}
+\label{tab:dataset}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lp{4.5cm}}
+\hline
+\textbf{Property} & \textbf{Specification / Value} \\
+\hline
+Dataset Provenance & Vrban\v{c}i\v{c} et al. (\textit{Data in Brief}, 2020) \cite{vrbancic2020datasets} \\
+Feature Modality & Static URL Lexical, Path, File, Query, and Resolver \\
+Total URL Instances & 58,645 URLs \\
+Raw Feature Dimensions & 111 Numeric Features (97 Lexical / 14 Resolver; 96/15 in \cite{vrbancic2020datasets}) \\
+Retained Dimensions & 98 Informative Features (13 Constant Domain Delimiters Filtered) \\
+Target Class & Binary: Phishing (1) vs. Legitimate (0) \\
+Phishing Instances & 30,647 (52.26\%) \\
+Legitimate Instances & 27,998 (47.74\%) \\
+Train / Test Partition & 80\% Stratified Train (46,916) / 20\% Test (11,729) \\
+Missing / Sentinel Values & 0 NaN (Unset/unavailable metrics encoded as $-1$) \\
+\hline
+\end{tabular}
+}
+\end{table}

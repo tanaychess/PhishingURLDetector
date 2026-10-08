@@ -1,0 +1,93 @@
+# Configuration for Phishing Detection & Explainability Framework
+# Research Project: Explainable Machine Learning Framework for Phishing Website Detection (XAI)
+# Author: Tanay Samson Pathare (Bhonsala Military College)
+
+project:
+  name: "PhishingURLDetetctor"
+  title: "An Explainable Machine Learning Framework for Phishing Website Detection Using URL-Based Features"
+  version: "1.0.0"
+  random_seed: 42
+  author: "Tanay Samson Pathare"
+  institution: "Bhonsala Military College"
+  email: "tanaypathare1@gmail.com"
+
+dataset:
+  raw_path: "data/raw/dataset_small.csv"
+  processed_train_path: "data/processed/train.csv"
+  processed_test_path: "data/processed/test.csv"
+  target_column: "phishing"
+  test_size: 0.20
+  stratify: true
+  dataset_name: "Vrbančič et al. Phishing Dataset (Data in Brief 2020)"
+  dataset_doi: "10.1016/j.dib.2020.106438"
+
+preprocessing:
+  imputation_strategy: "median"
+  scaling: "standard" # StandardScaler for linear/SVM models
+  remove_constant_features: true
+  variance_threshold: 0.0
+
+models:
+  logistic_regression:
+    max_iter: 1000
+    C: 1.0
+    solver: "lbfgs"
+    random_state: 42
+  decision_tree:
+    max_depth: 12
+    min_samples_split: 10
+    min_samples_leaf: 5
+    random_state: 42
+  random_forest:
+    n_estimators: 100
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    n_jobs: -1
+    random_state: 42
+  linear_svm:
+    C: 1.0
+    max_iter: 2000
+    random_state: 42
+  xgboost:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    eval_metric: "logloss"
+    random_state: 42
+    n_jobs: -1
+
+explainability:
+  method: "SHAP"
+  background_samples: 100
+  test_explanation_samples: 500
+  local_explanation_indices: [0, 5, 12, 42]
+  tree_model: "xgboost"
+
+feature_selection:
+  method: "shap_importance"
+  top_k_subsets: [5, 10, 20, 30]
+
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "roc_auc"
+    - "average_precision"
+    - "inference_latency_ms"
+    - "training_time_sec"
+  cross_validation_folds: 5
+
+paths:
+  results_metrics: "results/metrics"
+  results_predictions: "results/predictions"
+  results_explanations: "results/explanations"
+  results_logs: "results/logs"
+  figures: "figures"
+  tables: "tables"
+  paper_tables: "paper/overleaf/tables"
+  paper_figures: "paper/overleaf/figures"

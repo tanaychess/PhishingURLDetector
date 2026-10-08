@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\caption{Model Hyperparameter Configurations}
+\label{tab:model_config}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lp{4.5cm}}
+\hline
+\textbf{Model Architecture} & \textbf{Hyperparameter Specification} \\
+\hline
+Logistic Regression & L2 penalty, $C=1.0$, L-BFGS solver, max\_iter=1000 \\
+Decision Tree & Gini impurity, max\_depth=12, min\_samples\_split=10 \\
+Random Forest & 100 trees, max\_depth=15, min\_samples\_split=5 \\
+Linear SVM & LinearSVC ($C=1.0$), Platt calibrated (3-fold CV) \\
+XGBoost & 100 estimators, max\_depth=6, $\eta=0.1$, subsample=0.8, colsample=0.8, histogram method \\
+\hline
+\end{tabular}
+}
+\end{table}

@@ -1,0 +1,72 @@
+\section{Results and Empirical Analysis}
+\label{sec:results}
+
+\subsection{Comparative Classifier Performance}
+Table~\ref{tab:model_comparison} summarizes the empirical performance of all five machine learning models on the held-out test partition ($N_{\text{test}} = 11,729$), alongside 5-fold cross-validation scores on the training set, PR-AUC, and batched inference latency.
+
+\input{tables/table3_model_comparison.tex}
+
+Tree-based ensemble architectures demonstrate superior discriminative capability over linear baselines:
+\begin{itemize}
+    \item \textbf{XGBoost} achieves the highest overall performance: 94.82\% Accuracy, 94.88\% Precision, 95.22\% Recall, 95.05\% F1, 0.9879 ROC-AUC, and 0.9889 PR-AUC (5-fold CV F1: $95.17\% \pm 0.13\%$) with $2.46 \pm 0.20$\,ms batch latency per $10^3$ URLs and 0.71\,ms single-query latency ($\sim 60\times$ the 11.6\,$\mu$s feature extraction time).
+    \item \textbf{Random Forest} attains 94.30\% Accuracy, 94.57\% F1, 0.9867 ROC-AUC, and 0.9880 PR-AUC (CV F1: $94.79\% \pm 0.11\%$) with $10.60 \pm 0.31$\,ms latency per $10^3$ URLs.
+    \item \textbf{Decision Tree} achieves 93.61\% Accuracy, 93.92\% F1, and 0.9668 ROC-AUC (CV F1: $93.62\% \pm 0.17\%$) at $0.53 \pm 0.05$\,ms latency.
+    \item \textbf{Linear Models} (Logistic Regression and Linear SVM) attain 89.97\% and 89.99\% accuracy (CV F1: $90.48\%$ and $90.45\%$). Both models produce near-identical ROC-AUC (0.9613) and PR-AUC (0.9637) when rounded to four decimals (unrounded: 0.961327 vs. 0.961293 ROC-AUC; 0.963710 vs. 0.963676 PR-AUC). This parity is directly substantiated by the high cosine similarity of their standardized coefficient vectors ($\cos(\mathbf{w}_{\text{LR}}, \mathbf{w}_{\text{SVM}}) = 0.8307$) and a near-unity rank correlation between their continuous test decision scores ($\rho_s = 0.9997$ Spearman rank correlation, Pearson $r = 0.9836$); because threshold-free ROC and PR curves depend strictly on the rank-ordering of prediction scores, near-identical test rankings generate identical rounded area metrics.
+\end{itemize}
+
+On the test set, XGBoost identifies 5,836 True Positives ($TP$) out of 6,129 phishing URLs ($\text{Recall} = 95.22\%$) and 5,285 True Negatives ($TN$) out of 5,600 benign URLs ($\text{Specificity} = 94.38\%$), with $\text{FPR} = 5.62\%$ and $\text{FNR} = 4.78\%$.
+
+To verify whether XGBoost's performance advantage over Random Forest is statistically significant, we conducted McNemar's test with continuity correction on test predictions ($b=161$ instances where XGBoost was correct and RF incorrect; $c=100$ instances where RF was correct and XGBoost incorrect). The test yields $\chi^2 = 13.79$ ($p = 2.04 \times 10^{-4} < 0.001$), confirming statistical significance. Multi-seed evaluation across 5 random seeds (seeds 42, 123, 456, 789, 2024; varying model tree subsampling with fixed test split) confirms stability: XGBoost achieves a mean accuracy of $94.74\% \pm 0.08\%$ and a mean F1-score of $94.98\% \pm 0.08\%$ versus Random Forest's $94.59\% \pm 0.06\%$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/fig5_roc_pr_curves.pdf}
+\caption{Discrimination Diagnostics: (a) ROC Curves, and (b) Precision-Recall Curves across all evaluated classifiers.}
+\label{fig:roc_pr}
+\end{figure}
+
+Fig.~\ref{fig:roc_pr} depicts the ROC and Precision-Recall (PR) curves. XGBoost and Random Forest maintain steep true positive trajectories, achieving Average Precision (AP) scores of 0.9889 and 0.9880 respectively, with Decision Tree achieving 0.9546 AP.
+
+\subsection{Explainable AI via TreeSHAP}
+TreeSHAP analysis was executed strictly on the training partition ($N=500$ random samples) to extract global feature rankings without selection leakage. Table~\ref{tab:shap_features} details the top 10 most influential features according to mean absolute SHAP value and plausible cybersecurity semantic rationales.
+
+\input{tables/table6_top_shap_features.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/fig7_shap_summary_beeswarm.pdf}
+\caption{SHAP Summary Beeswarm Plot Illustrating Feature Impact Directionality on the Training Partition.}
+\label{fig:shap_beeswarm}
+\end{figure}
+
+Fig.~\ref{fig:shap_beeswarm} illustrates global importance and directional attribution across training samples:
+\begin{enumerate}
+    \item \textbf{Directory Length (\texttt{directory\_length})}: Emerges as the top feature ($\text{Mean } |\text{SHAP}| = 1.0811$). Elongated paths (red points) shift predictions toward higher phishing log-odds. Crucially, as detailed in Section~\ref{sec:methodology}, this attribution reflects both directory depth and qualitative presence, as 59.86\% of legitimate URLs lack paths (encoded as $-1$). Decision trees split between $-1$ (path absent) and positive lengths, effectively combining existence and magnitude into a single decision threshold.
+    \item \textbf{Domain Registration Age (\texttt{time\_domain\_activation})}: Represents the second most decisive feature ($0.9912$). Mature domains correlate with negative SHAP values (legitimate signal), whereas recent domains and unresolvable WHOIS records ($-1$ sentinels) shift log-odds toward phishing, capturing throwaway infrastructure.
+    \item \textbf{Delimiters and Structural Tokens (\texttt{qty\_slash\_url}, \texttt{length\_url}, \texttt{qty\_dot\_domain})}: Slash counts ($0.7377$), URL length ($0.7222$), and authority dots ($0.5293$) reflect structural obfuscation tactics commonly leveraged to evade token filters.
+\end{enumerate}
+
+\subsection{Feature Selection and Computational Benchmarking}
+To assess whether compact feature subsets maintain classification performance, we evaluated XGBoost across nested feature subsets ranked by training set SHAP importance: Full (98 features), Top-30, Top-20, Top-10, Top-5, alongside a dedicated \textbf{Lexical-Only baseline} (84 features, 0 network lookups). Table~\ref{tab:feature_selection_resources} and Fig.~\ref{fig:feature_selection} delineate performance, latency, and throughput trade-offs.
+
+\input{tables/table4_feature_selection_resources.tex}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.88\columnwidth]{figures/fig9_feature_reduction_comparison.pdf}
+\caption{Classification Performance vs. Dimensionality and Inference Latency Across Feature Subsets.}
+\label{fig:feature_selection}
+\end{figure}
+
+Evaluating nested feature reduction via 5-fold cross-validation on $\mathcal{D}_{\text{train}}$ reveals progressive convergence: CV F1 increases from 91.85\% at $k=5$ and 94.52\% at $k=10$ to 95.02\% at $k=20$, 95.17\% at $k=30$, and 95.20\% at $k=98$. Although CV performance continues to edge upward at higher dimensions, we select $k=20$ as the smallest subset within about 0.2\,pp of full performance. Because SHAP feature rankings were computed on all of $\mathcal{D}_{\text{train}}$, top-$k$ cross-validation scores reflect mild optimism from training-set ranking reuse, whereas held-out test evaluations are strictly unbiased. Pruning the feature space to the \textbf{Top-20 subset} (a 79.6\% reduction) preserves full predictive performance: Accuracy is 94.82\%, F1-score is 95.05\%, and ROC-AUC is 0.9876 on seed 42, while multi-seed evaluation across 5 random seeds confirms stability with a test mean accuracy of $94.71\% \pm 0.09\%$, mean F1-score of $94.95\% \pm 0.08\%$, and ROC-AUC of $0.9876 \pm 0.0001$ (closely matching the full model's $94.74\% \pm 0.08\%$ and $94.98\% \pm 0.08\%$). Concurrently, model-only inference latency (excluding external network lookups) decreases from $2.46 \pm 0.20$\,ms to $1.67 \pm 0.06$\,ms per $10^3$ queries in batch mode (a 32.3\% reduction; single-query latency falls to 0.46\,ms median, 0.56\,ms mean vs. 0.71\,ms for Full 98), while batch throughput increases from 406,318 to 600,099 queries/s on standard CPU hardware. The \textbf{Top-10 subset} also maintains robust efficacy with 94.19\% accuracy and 94.48\% F1-score at $1.57 \pm 0.11$\,ms latency.
+
+Crucially, the \textbf{Lexical-Only model} achieves 89.68\% accuracy, 90.04\% F1-score, and 0.9627 ROC-AUC (CV F1: $90.19\% \pm 0.17\%$) using zero network lookups. To evaluate a practical two-tier architecture, we implemented an uncertainty-gated cascade: when the Tier 1 lexical model's predicted probability falls within an uncertainty band $[\tau_L, \tau_H]$, classification is deferred to the Tier 2 Top-20 resolver model. Operating thresholds were calibrated strictly via 5-fold cross-validation on the training set ($\mathcal{D}_{\text{train}}$) to maximize query offloading while constraining the Tier-1 out-of-fold phishing leakage rate below 2.5\% (CV sweep at $[\tau_L, \tau_H] = [0.10, 0.90]$: 64.21\% coverage, 97.98\% accuracy, 2.35\% phishing leak rate).
+
+On the held-out test partition ($N=11,729$), Tier 1 autonomously resolves 64.28\% of instances (7,539 URLs) purely in-memory with 97.78\% accuracy, eliminating external lookups for nearly two-thirds of incoming traffic. Specifically, Tier 1 classifies 3,380 URLs as legitimate ($\hat{p} < 0.10$), of which 3,290 are true legitimate and 90 are false legitimate (phishing URLs misclassified as legitimate). This yields an empirical test leak rate of 2.66\% (90/3,380), which slightly exceeds the 2.5\% training design target due to test distribution variation. Tier 1 classifies 4,159 URLs as phishing ($\hat{p} > 0.90$), with 4,082 true phishing and 77 false alarms. Across the 4,172 phishing URLs resolved at Tier 1, 4,082 are caught, yielding a conditional Tier-1 phishing recall of 97.84\% (4,082/4,172); however, this conditional metric excludes the 1,957 phishing URLs deferred to Tier 2.
+
+Evaluating end-to-end cascade performance across all 11,729 test instances—where the 4,190 deferred ambiguous cases are evaluated by Tier 2, which attains 88.78\% accuracy on these difficult instances—the cascade achieves an overall Accuracy of 94.57\% and F1-score of 94.81\% ($TP=5,824$, $TN=5,268$, $FP=332$, $FN=305$). The end-to-end cascade False Negative Rate is $\text{FNR} = 4.98\%$ (305 / 6,129) and False Positive Rate is $\text{FPR} = 5.93\%$ (332 / 5,600), trailing the monolithic full-feature model ($\text{FNR} = 4.78\%$, $\text{FPR} = 5.62\%$) by 0.20\,pp and 0.31\,pp while eliminating 64.28\% of external resolver queries. Thus, rather than establishing absolute superiority, the results support a tiered design whose operational benefit is offloading network queries at the cost of a modest error increase. Under a narrower deferral band $[\tau_L, \tau_H] = [0.15, 0.85]$ (providing wider autonomous decision regions), 73.1\% of queries are resolved at Tier 1 with 96.93\% accuracy (94.42\% overall accuracy).
+
+Analyzing Tier 1 resolutions by path presence reveals both operational efficiency and a security vulnerability: Tier 1 resolves 3,051 legitimate root URLs lacking paths, 316 legitimate URLs with paths, 4,083 phishing URLs with paths, and 89 pathless phishing URLs. Critically, 88 of the 141 pathless phishing URLs in the test set (62.4\%) are misclassified as legitimate at Tier 1 ($\hat{p} < 0.10$) and never reach Tier 2, as attackers using apex root domains without path tokens evade lexical filtering. 
+
+As a trivial comparison baseline, a heuristic classifying URLs as phishing whenever a directory path exists (\texttt{directory\_length} $> -1$) achieves 79.84\% accuracy, 83.51\% F1-score, and 97.70\% recall, capitalizing on dataset sampling skew (97.70\% of phishing vs 39.71\% of legitimate URLs contain paths). To verify whether XGBoost learns true discriminative patterns beyond this sampling artifact, we evaluate performance separately on path-bearing and pathless test subsets: on the 8,212 path-bearing URLs (where 5,988 phishing and 2,224 legitimate URLs reside, rendering naive path heuristics ineffective with only 72.92\% accuracy), full XGBoost achieves 93.59\% accuracy, 96.34\% recall, 94.95\% precision, and 95.64\% F1-score ($TN=1,917$, $FP=307$, $FN=219$, $TP=5,769$). On the 3,517 pathless URLs (141 phishing and 3,376 legitimate), monolithic XGBoost catches only 47.52\% of pathless phishing (67 of 141; $\text{Recall} = 47.52\%$, $\text{F1} = 62.04\%$), achieving 97.67\% accuracy and 99.76\% specificity ($TN=3,368$, $FP=8$, $FN=74$, $TP=67$). Notably, this 97.67\% pathless accuracy stands merely 1.68 percentage points above the all-legitimate baseline of 95.99\% (predicting all 3,517 pathless URLs as legitimate yields 95.99\% accuracy). Furthermore, an ablation removing all 56 directory, file, and parameter features—yielding a 28-feature model with no path/file/query-group features (though general length and slash counts still partially encode path presence)—attains 89.17\% accuracy (86.23\% on path-bearing, 96.05\% on pathless) and 89.58\% F1-score. When deployed in Tier 1 of the cascade at $[0.10, 0.90]$, this model resolves 62.48\% of test queries (7,328 URLs) with 97.69\% accuracy, sustaining 94.53\% overall cascade accuracy and 94.78\% F1-score, confirming that non-path lexical features reduce reliance on explicit path tokens while still supporting a tiered design.
+

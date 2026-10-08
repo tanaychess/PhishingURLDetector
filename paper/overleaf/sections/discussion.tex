@@ -1,0 +1,36 @@
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\subsection{Operational Considerations and Extraction Trade-offs}
+A critical operational factor in ML phishing detection is distinguishing \textbf{feature extraction latency} from \textbf{model inference latency}:
+\begin{itemize}
+    \item \textbf{Lexical URL Features}: Metrics such as \texttt{directory\_length}, \texttt{qty\_slash\_url}, and \texttt{length\_url} are parsed entirely in-memory from URL strings. Our empirical benchmarks show in-memory parsing averages 11.6\,$\mu$s per URL ($\approx 11.6$\,ms per $10^3$ URLs), without external network overhead.
+    \item \textbf{Resolver/Network Metadata}: Features like \texttt{time\_domain\_activation}, \texttt{ttl\_hostname}, \texttt{asn\_ip}, \texttt{time\_response}, and \texttt{qty\_redirects} require DNS records, WHOIS registries, or socket handshakes. As documented in prior empirical measurements, external resolver lookups introduce substantial round-trip network delays—typically incurring tens to hundreds of milliseconds for synchronous DNS resolution, WHOIS TCP queries, and TLS handshakes \cite{hannousse2021towards, marchal2017off}—as well as query rate limits, preventing low-latency synchronous inline evaluation across high-throughput enterprise gateways without queuing or deferral.
+\end{itemize}
+
+Quantifying external dependencies across evaluated subsets:
+In the \textbf{Top-10 subset}, exactly 5 features are network-dependent (\texttt{time\_domain\_activation}, \texttt{ttl\_hostname}, \texttt{asn\_ip}, \texttt{time\_response}, \texttt{qty\_redirects}) and 5 are lexical. In the \textbf{Top-20 subset}, 11 features are network-dependent (adding \texttt{time\_domain\_expiration}, \texttt{qty\_nameservers}, \texttt{qty\_mx\_servers}, \texttt{qty\_ip\_resolved}, \texttt{tls\_ssl\_certificate}, \texttt{domain\_spf}) and 9 are lexical. In the \textbf{Full 98 set}, 14 features require network lookups while 84 are lexical.
+
+To address this operational bottleneck, our empirical evaluation \textbf{supports a tiered design} for perimeter defense:
+\begin{itemize}
+    \item \textbf{Tier 1 (Zero-Network Lexical Filter)}: The 84-feature lexical-only model evaluates incoming URLs purely in-memory at 11.6\,$\mu$s extraction latency. Under an uncertainty band of $[\tau_L, \tau_H] = [0.10, 0.90]$ (calibrated on training CV), Tier 1 definitively classifies 64.28\% of incoming traffic with 97.78\% accuracy (2.66\% phishing test leakage, slightly above the 2.5\% training design target), requiring 0 external network calls.
+    \item \textbf{Tier 2 (Resolver-Augmented Top-20)}: For borderline instances ($0.10 \le \hat{p} \le 0.90$, representing 35.72\% of traffic), external DNS/WHOIS lookups are dispatched to execute the Top-20 model (0.46\,ms median single-query latency), yielding 88.78\% accuracy on these deferred difficult cases and an overall pipeline accuracy of 94.57\% (94.81\% F1-score; end-to-end $\text{FNR}=4.98\%$, $\text{FPR}=5.93\%$, slightly trailing monolithic rates of $\text{FNR}=4.78\%$ and $\text{FPR}=5.62\%$) while eliminating nearly two-thirds of external lookups.
+\end{itemize}
+
+\subsection{Quantitative Error Analysis}
+Analysis of 293 False Negatives ($FN = 293$, 4.78\% of phishing test samples) and 315 False Positives ($FP = 315$, 5.62\% of legitimate test samples) reveals distinct structural patterns influenced by $-1$ sentinel distributions:
+\begin{itemize}
+    \item \textbf{False Negatives}: Phishing URLs misclassified as legitimate exhibited shallow or absent directory paths (median 1.0 char, mean 6.57 vs. median 24.0, mean 29.57 in TP), shorter overall length (median 22.0 vs. 48.0 in TP), and fewer slashes (median 1.0 vs. 3.0 in TP). Crucially, 44.71\% of FNs (131/293) had failed WHOIS lookups resulting in $-1$ sentinels for domain activation age, compared to 35.32\% in TPs (2,061/5,836), a statistically significant difference ($\chi^2 = 10.31, p = 0.0013$, chi-square contingency test). Including $-1$ sentinels, the median domain age was 159.0 days for FNs vs 682.5 days for TPs, driven by the higher concentration of failed lookups. However, excluding $-1$ sentinels, valid FN domains averaged 3,351.66 days (median 2,702.50 days, $N=162$) versus valid TP domains averaging 2,313.14 days (median 1,914.00 days, $N=3,775$). This suggests that FNs evade detection through two mechanisms: (i) lookup failures that collapse into default $-1$ sentinels, and (ii) hosting on genuinely older, compromised legitimate domains or aged parked infrastructure.
+    \item \textbf{False Positives}: Legitimate URLs misclassified as phishing featured elongated directory paths (median 13.0 chars, mean 18.55 vs. median $-1.0$, mean 3.41 in TN; 97.5\% of FPs had paths vs. only 36.3\% of TNs), longer URLs (median 33.0 vs. 18.0 in TN), more slashes (median 2.0 vs. 0.0 in TN), and directory hyphens (mean 0.63 vs. $-0.49$ in TN; excluding $-1$ sentinels, FP mean was 0.67 vs. 0.41 in TN), typical of single-page apps, deep tracking links, and UTM parameter structures.
+\end{itemize}
+
+\subsection{Limitations and Threats to Validity}
+Key limitations and threats to validity include:
+\begin{enumerate}
+    \item \textbf{Sampling Artifacts and Row Duplication}: Legitimate URLs in the benchmark originate from Alexa top domains and search indices (which disproportionately represent root/apex domains lacking paths, where 60.29\% assign $-1$), whereas phishing URLs originate from PhishTank (where 97.70\% contain sub-paths). Furthermore, an exact cross-partition audit identified 335 instances (2.86\% of test) that share identical feature vectors with training rows, 99.1\% of which share identical labels. Evaluating on the strictly de-duplicated test subset ($N = 11,394$) preserves 94.71\% accuracy and 95.05\% F1-score for XGBoost (94.18\% / 94.58\% for RF), confirming that row repetition does not alter experimental conclusions.
+    \item \textbf{Adversarial Evasion and Root-Domain Blind Spots}: Attackers aware of tiered or lexical filtering can deliberately evade Tier 1 detection by hosting deceptive credential-harvesting forms directly on root/apex domains without directory paths or query parameters. As revealed in Section~\ref{sec:results}, 88 of 141 pathless phishing test instances (62.4\%) bypass Tier 1 as false legitimate because they mimic the lexical simplicity of Alexa apex sites. Mitigating this evasion tactic requires operational gateways to mandate Tier 2 resolver inspection or domain registration age verification whenever an uncataloged apex domain requests access.
+    \item \textbf{Temporal Age and Concept Drift}: The dataset dates from 2020. Modern evasion tactics (e.g., serverless proxies, IPFS gateways, and legitimate SaaS subdomains) and cross-dataset performance warrant further evaluation.
+    \item \textbf{Lookup Reliability and Sentinel Confounding}: External WHOIS/DNS lookups can suffer rate-limiting, privacy redaction, or deliberate sinkholing, collapsing informative metrics into $-1$ sentinels.
+    \item \textbf{Hyperparameter Tuning}: Models were evaluated under fixed standard configurations without exhaustive grid search, prioritizing baseline reproducibility over hyperparameter tuning.
+\end{enumerate}
+

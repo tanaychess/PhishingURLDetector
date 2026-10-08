@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\caption{Impact of Training-Set SHAP-Guided Feature Reduction on XGBoost Performance and Latency}
+\label{tab:feature_selection}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Feature Subset} & \textbf{Net / Lex} & \textbf{Acc (\%)} & \textbf{Prec (\%)} & \textbf{Rec (\%)} & \textbf{F1 (\%)} & \textbf{Lat (ms/1k)} \\
+\hline
+Full (98 feats) & 14N / 84L & 94.82 & 94.88 & 95.22 & 95.05 & 2.46 $\pm$ 0.20 \\
+Top-30 & 12N / 18L & 94.74 & 94.83 & 95.12 & 94.97 & 1.83 $\pm$ 0.07 \\
+Top-20 & 11N / 9L & 94.82 & 94.85 & 95.25 & 95.05 & 1.67 $\pm$ 0.06 \\
+Top-10 & 5N / 5L & 94.19 & 93.92 & 95.04 & 94.48 & 1.57 $\pm$ 0.11 \\
+Top-5 & 1N / 4L & 91.32 & 90.31 & 93.41 & 91.84 & 1.59 $\pm$ 0.12 \\
+\hline
+\end{tabular}
+}
+\end{table}

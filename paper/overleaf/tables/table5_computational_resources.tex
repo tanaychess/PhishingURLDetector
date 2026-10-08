@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\caption{Computational Resource Footprint and Query Throughput Profile}
+\label{tab:computational}
+\centering
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{lcccc}
+\hline
+\textbf{Model Architecture} & \textbf{Feature Set} & \textbf{Size (MB)} & \textbf{Latency (ms/1k)} & \textbf{Throughput (q/s)} \\
+\hline
+Logistic Regression & Full (98) & 0.004 & 1.41 $\pm$ 0.16 & 708,898 \\
+Decision Tree & Full (98) & 0.029 & 0.53 $\pm$ 0.05 & 1,884,868 \\
+Random Forest & Full (98) & 4.068 & 10.60 $\pm$ 0.31 & 94,369 \\
+Linear SVM & Full (98) & 0.006 & 2.85 $\pm$ 0.20 & 350,920 \\
+XGBoost & Full (98) & 0.126 & 2.46 $\pm$ 0.20 & 406,318 \\
+XGBoost (Top-20) & Top-20 & 0.130 & 1.67 $\pm$ 0.06 & 600,099 \\
+\hline
+\multicolumn{5}{l}{\footnotesize * Footprint, latency, and throughput evaluated under random seed 42.} \\
+\end{tabular}
+}
+\end{table}

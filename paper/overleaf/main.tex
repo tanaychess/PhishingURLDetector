@@ -1,0 +1,68 @@
+\documentclass[a4paper,conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% Essential LaTeX packages
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{microtype}
+
+\usepackage{balance}
+
+% Float control parameters for clean, professional IEEE conference layout
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.95}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.85}
+\renewcommand{\dbltopfraction}{0.95}
+\renewcommand{\dblfloatpagefraction}{0.85}
+
+% Compact bibliography spacing
+\def\IEEEbibitemsep{1pt plus 1pt}
+
+\begin{document}
+
+\title{An Explainable Machine Learning Framework for Phishing Website Detection Using URL and Network Features}
+
+\author{
+\IEEEauthorblockN{Tanay Samson Pathare}
+\IEEEauthorblockA{Department of Computer Science, Bhonsala Military College\\
+Nashik, Maharashtra, India\\
+Email: tanaypathare1@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+Phishing websites represent a pervasive cyber threat engineered to harvest credentials through deceptive web infrastructure. While machine learning enables proactive detection beyond signature blacklists, operational deployment is hindered by model opacity and the network latency of external domain inspection. This paper presents an explainable machine learning framework for phishing website detection using 111 structured URL lexical, path, query, and network resolver features on a benchmark corpus of 58,645 URLs. Evaluating five classification architectures across 11,729 held-out test instances with 5-fold cross-validation on the training set, XGBoost achieves superior discrimination, yielding a 5-seed mean of 94.74\% $\pm$ 0.08\% accuracy and 94.98\% $\pm$ 0.08\% F1-score (seed 42: 94.82\% accuracy, 95.05\% F1-score; seeds vary model tree subsampling on a fixed split), statistically outperforming Random Forest ($p < 0.001$, McNemar's test). Tree-based Shapley Additive Explanations (TreeSHAP) applied strictly to training data enable train-only attribution, demonstrating robust ranking stability under model retraining ($\rho_s = 0.973 \pm 0.010$ across all 98 features, Kendall's $\tau = 0.795$ within the top 20, and 95.0\% top-20 set overlap across independent model training seeds; $\rho_s = 0.9991$ under explanation subsampling) and identifying directory length, domain registration age, and delimiter frequency as primary discriminators. Feature reduction demonstrates that a compact top-20 subset—the smallest subset within about 0.2\,pp of full training CV F1—matches full-model test efficacy while reducing model-only inference latency (excluding resolver lookups) to 1.67\,ms per $10^3$ queries. Furthermore, an uncertainty-gated cascade resolves 64.3\% of URLs in-memory with 97.78\% Tier-1 accuracy using zero-network lexical parsing, supporting a tiered design for high-throughput perimeter triage that offloads nearly two-thirds of external network calls despite a modest increase in error rates (end-to-end FNR: 4.98\% vs. 4.78\%; FPR: 5.93\% vs. 5.62\%).
+\end{abstract}
+
+\begin{IEEEkeywords}
+Phishing Website Detection, Explainable Artificial Intelligence (XAI), Machine Learning, URL Features, TreeSHAP, Feature Selection, Cybersecurity.
+\end{IEEEkeywords}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/experiments}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\section*{Data and Code Availability}
+To ensure reproducibility and open scientific evaluation, all source code, preprocessing scripts, model training routines, feature ranking pipelines, and serialized experiment data are available in the project repository at: \url{https://github.com/tanaychess/PhishingURLDetetctor}.
+
+\section*{Acknowledgment}
+The author acknowledges the Department of Computer Science, Bhonsala Military College, for providing research infrastructure and computational resources for this investigation.
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
