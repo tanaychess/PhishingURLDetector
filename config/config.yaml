@@ -3,7 +3,7 @@
 # Author: Tanay Samson Pathare (Bhonsala Military College)
 
 project:
-  name: "PhishingURLDetetctor"
+  name: "PhishingURLDetector"
   title: "An Explainable Machine Learning Framework for Phishing Website Detection Using URL-Based Features"
   version: "1.0.0"
   random_seed: 42

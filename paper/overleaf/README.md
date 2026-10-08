@@ -9,11 +9,11 @@
 
 ## Instructions for Overleaf Upload
 
-1. **Download the ZIP**: Locate the file `PhishingURLDetetctor_Overleaf.zip` in this directory or in `paper/`.
+1. **Download the ZIP**: Locate the file `PhishingURLDetector_Overleaf.zip` in this directory or in `paper/`.
 2. **Import into Overleaf**:
    - Log into [Overleaf](https://www.overleaf.com/).
    - Click **New Project** -> **Upload Project**.
-   - Select `PhishingURLDetetctor_Overleaf.zip`.
+   - Select `PhishingURLDetector_Overleaf.zip`.
 3. **Compile**:
    - Set the compiler to **pdfLaTeX** (default).
    - Set the TeX Live version to **2024 / Latest**.

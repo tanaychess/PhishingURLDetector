@@ -74,20 +74,23 @@ All numerical results are verified and mathematically validated on the 11,729 he
 | **XGBoost (Lexical-84, Zero Net)** | **0N / 84L** | **89.68%** | **90.04%** | **0.9627** | **3.16 ± 0.43 ms** | **0.342 MB** | **316,002** |
 
 *Key Findings*:
-1. **$k=20$ Selection**: Selected via 5-fold CV on training data as the smallest subset within about 0.2 pp of full performance ($95.02\%$ at $k=20$, $95.17\%$ at $k=30$, $95.20\%$ at $k=98$). Note: SHAP rankings were computed on all of D_train, so CV scores for top-k are slightly optimistic, while test results remain unaffected. Multi-seed test mean across 5 seeds: $94.71\% \pm 0.09\%$ Accuracy, $94.95\% \pm 0.08\%$ F1-score.
+1. **$k=20$ Selection**: Selected via 5-fold CV on training data as the smallest tested subset within about 0.2 pp of full performance ($95.02\%$ at $k=20$, $95.17\%$ at $k=30$, $95.20\%$ at $k=98$). Note: SHAP rankings were computed on all of D_train, so CV scores for top-k are slightly optimistic, while test results remain unaffected. Multi-seed test mean across 5 seeds: $94.71\% \pm 0.09\%$ Accuracy, $94.95\% \pm 0.08\%$ F1-score.
 2. **Two-Tier Uncertainty-Gated Cascade**:
    - Tier 1 (Lexical-84, threshold band $[0.10, 0.90]$) autonomously resolves **64.28%** of URLs (7,539 / 11,729) in-memory with **97.78%** accuracy, eliminating resolver lookups for nearly two-thirds of traffic.
-   - Tier 1 test leakage rate is $2.66\%$ ($90$ phishing leaks / 3,380 URLs called legitimate), slightly above the $2.5\%$ CV design target.
+   - Tier 1 test leakage rate is $2.66\%$ ($90$ phishing leaks / 3,380 URLs called legitimate with $\hat{p} < 0.10$), slightly above the $2.5\%$ CV design target.
    - Conditional Tier-1 phishing recall is $97.84\%$ ($4,082 / 4,172$) on resolved URLs. Accounting for deferred URLs, the **end-to-end cascade** achieves Accuracy $94.57\%$, F1 $94.81\%$, FNR $4.98\%$, and FPR $5.93\%$ (vs. Monolithic Full XGBoost: Acc $94.82\%$, F1 $95.05\%$, FNR $4.78\%$, FPR $5.62\%$).
-   - Root-domain blind spot: $88$ of $141$ pathless phishing test URLs ($62.4\%$) are predicted legitimate at Tier 1, highlighting an operational limitation against root-domain phishing.
+   - Root-domain blind spot: $88$ of $141$ pathless phishing test URLs ($62.4\%$) are predicted legitimate at Tier 1 ($\hat{p} < 0.10$), highlighting an operational limitation against root-domain phishing.
    - Path-bearing vs. Pathless URLs: On the 8,212 path-bearing test URLs, full XGBoost achieves $93.59\%$ accuracy and $95.64\%$ F1 (vs. naive path heuristic $72.92\%$). On the 3,517 pathless URLs, monolithic XGBoost catches only 47.5% of pathless phishing (67/141; Recall = 47.52%, F1 = 62.04%), and its $97.67\%$ pathless accuracy stands merely 1.7 pp above the naive all-legitimate baseline of 96.0% (3,376/3,517).
+3. **Cross-Partition Twin Analysis & De-duplication**: An exact audit identified 335 test instances (2.86%) sharing identical feature vectors with training rows (99.1% share identical ground-truth labels). On the strictly de-duplicated test subset ($N=11,394$), XGBoost preserves $94.71\%$ accuracy and $95.05\%$ F1-score (RF: $94.18\%$ / $94.58\%$), proving that row repetition does not alter conclusions.
+4. **Base-Rate Sensitivity (1% Phishing Prevalence)**: In production traffic with $\le 1\%$ phishing prevalence, 95.2% recall and 5.6% FPR yield $\approx 14.6\%$ precision ($\approx 55,600$ false alarms per million URLs), highlighting the necessity of conservative operational thresholds ($\tau_H \ge 0.99$) or tiered cascaded triage.
+5. **Resolver Latency Validation**: Synchronous DNS resolution across 50 distinct global domains empirically averages $93.81$\,ms median and $150.46$\,ms mean ($332.06$\,ms 90th percentile) vs. $11.6\,\mu$s in-memory lexical parsing—substantiating the practical utility of Tier-1 zero-network screening.
 
 ---
 
 ## 5. Directory Structure
 
 ```text
-PhishingURLDetetctor/
+PhishingURLDetector/
 ├── README.md                          # Comprehensive project documentation
 ├── requirements.txt                   # Locked Python package dependencies
 ├── LICENSE                            # Open-source MIT License
@@ -165,9 +168,9 @@ PhishingURLDetetctor/
 │   │   ├── sections/                  # Modular .tex sections
 │   │   ├── tables/                    # Automated LaTeX tables
 │   │   ├── figures/                   # Vector PDF & PNG figures
-│   │   └── PhishingURLDetetctor_Overleaf.zip
+│   │   └── PhishingURLDetector_Overleaf.zip
 │   └── final/
-│       └── PhishingURLDetetctor.pdf   # Final compiled manuscript
+│       └── PhishingURLDetector.pdf    # Final compiled manuscript
 │
 └── docs/
     ├── research_plan.md               # Formal research design and objectives
@@ -188,11 +191,11 @@ PhishingURLDetetctor/
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
-# Install dependencies
+# Install dependencies (strictly pinned in requirements.txt)
 pip install -r requirements.txt
 ```
 
-### Step 2: Reproduce Tables and Manuscript Artifacts
+### Step 2: Reproduce Tables, Cascade, and Manuscript Artifacts
 You can reproduce specific tables or the entire experiment suite with individual commands:
 
 - **Reproduce Table III (Multi-Model Comparison, N=11,729)**:
@@ -207,6 +210,24 @@ You can reproduce specific tables or the entire experiment suite with individual
   ```
   *Outputs*: `results/metrics/feature_selection_results.csv`, `paper/overleaf/tables/tab5_feature_selection.tex`
 
+- **Reproduce Two-Tier Uncertainty Cascade Analysis**:
+  ```bash
+  python run_cascade_analysis.py
+  ```
+  *Verifies*: Tier 1 autonomous coverage ($64.28\%$), accuracy ($97.78\%$), leak rate ($2.66\%$), and overall cascade accuracy ($94.57\%$).
+
+- **Reproduce Path-Bearing vs. Pathless Subset Efficacy**:
+  ```bash
+  python run_path_analysis.py
+  ```
+  *Verifies*: Performance on 8,212 path-bearing URLs ($93.59\%$ accuracy) vs. 3,517 pathless URLs ($97.67\%$ accuracy, $47.52\%$ recall).
+
+- **Reproduce Training CV $k$-Sweep & Multi-Seed Generalization**:
+  ```bash
+  python run_k_cv_seeds.py
+  ```
+  *Verifies*: 5-fold CV F1 progression ($91.85\%$ at $k=5$, $94.52\%$ at $k=10$, $95.02\%$ at $k=20$, $95.17\%$ at $k=30$, $95.20\%$ at $k=98$).
+
 - **Run Full Master Pipeline (All Experiments, Explanations & Plots)**:
   ```bash
   python experiments/run_all.py
@@ -217,11 +238,11 @@ You can reproduce specific tables or the entire experiment suite with individual
   python src/validate_results.py
   ```
 
-- **Compile Publication IEEE 4-Page PDF**:
+- **Compile Publication IEEE 4-Page PDF & Overleaf Distribution**:
   ```bash
   python src/generate_manuscript_pdf.py
   ```
-  *Outputs*: `paper/final/PhishingURLDetetctor.pdf` and refreshed `paper/overleaf/PhishingURLDetetctor_Overleaf.zip`
+  *Outputs*: `paper/final/PhishingURLDetector.pdf` and refreshed `paper/overleaf/PhishingURLDetector_Overleaf.zip`
 
 ### Step 3: Interactive Live URL Prediction & Explanation
 ```bash
@@ -232,9 +253,9 @@ python src/predict_url.py --sample 5
 
 ## 7. Overleaf & Paper Compilation
 
-1. Locate the pre-packaged archive: `paper/PhishingURLDetetctor_Overleaf.zip`.
+1. Locate the pre-packaged archive: `paper/PhishingURLDetector_Overleaf.zip`.
 2. Navigate to [Overleaf](https://www.overleaf.com/) and click **New Project** -> **Upload Project**.
-3. Upload `PhishingURLDetetctor_Overleaf.zip`.
+3. Upload `PhishingURLDetector_Overleaf.zip`.
 4. Compile with standard **pdfLaTeX**.
 
 ---
@@ -243,7 +264,7 @@ python src/predict_url.py --sample 5
 
 For venues requiring **double-blind peer review**, prepare the submission copy by applying these anonymization steps:
 1. **Author & Affiliation**: In `paper/overleaf/main.tex` (lines 35–42), replace author names and institutional affiliations with `\author{\IEEEauthorblockN{Anonymous Authors}\IEEEauthorblockA{\textit{Anonymous Institution / Department}\\Email: anonymous@institution.org}}`.
-2. **Repository URL**: In `paper/overleaf/sections/conclusion.tex` (or the Data & Code Availability section), mask the GitHub URL to: `https://anonymous.4open.science/r/PhishingURLDetetctor` (or an anonymous GitHub mirror).
+2. **Repository URL**: In `paper/overleaf/sections/conclusion.tex` (or the Data & Code Availability section), mask the GitHub URL to: `https://anonymous.4open.science/r/PhishingURLDetector` (or an anonymous GitHub mirror).
 3. **Acknowledgment**: Comment out `\section*{Acknowledgment}` in `paper/overleaf/main.tex` and `sections/conclusion.tex` during initial submission.
 4. For **single-blind** or **camera-ready** submission, retain the author and affiliation details as currently populated.
 
