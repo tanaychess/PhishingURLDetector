@@ -1,0 +1,110 @@
+# ==============================================================================
+# Git Ignore Configuration - Explainable Phishing URL Detection Research
+# Author: Tanay Samson Pathare (Bhonsala Military College)
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions & binary builds
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook & checkpoint caches
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IDEs and Code Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Model binaries & serialization dumps (keep code reproducible from data)
+*.joblib
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+results/logs/
+temp_models/
+
+# Testing, coverage, and profiler logs
+*.log
+.coverage
+.coverage.*
+.pytest_cache/
+htmlcov/
+.tox/
+scratch/
+
+# LaTeX auxiliary build files
+*.aux
+*.bbl
+*.blg
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.dvi
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+
+# OS & system generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Explicitly track essential research artifacts & outputs
+!data/raw/dataset_small.csv
+!data/processed/train.csv
+!data/processed/test.csv
+!paper/PhishingURLDetector.pdf
+!figures/*.pdf
+!figures/*.png
+!results/metrics/*.csv
+!results/predictions/*.csv
+!results/explanations/*.csv

@@ -1,0 +1,7 @@
+model,feature_set,model_size_mb,inference_latency_ms_per_1k,inference_latency_mean_ms,inference_latency_std_ms,throughput_queries_per_sec
+Logistic Regression,Full (98),0.0043,1.411,1.458,0.16,708898.0
+Decision Tree,Full (98),0.0294,0.531,0.543,0.048,1884868.1
+Random Forest,Full (98),4.0678,10.597,10.544,0.307,94369.1
+Linear SVM,Full (98),0.0061,2.85,2.882,0.196,350919.6
+XGBoost,Full (98),0.1262,2.461,2.537,0.195,406318.3
+XGBoost (Top-20),Top-20,0.1303,1.666,1.681,0.056,600099.2
