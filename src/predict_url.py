@@ -1,6 +1,6 @@
 """
 Interactive Live Phishing URL Predictor & Explainability Tool.
-Author: Tanay Samson Pathare (Bhonsala Military College)
+Author: Tanay Pathare (Bhonsala Military College)
 
 Provides instant inference and SHAP local feature risk attribution for any URL sample.
 """
@@ -81,7 +81,7 @@ def run_prediction_demo(sample_index=0, model_type="xgboost"):
     
     print("\n" + "=" * 78)
     print("      EXPLAINABLE PHISHING DETECTION: LIVE INFERENCE & EXPLANATION")
-    print("      Author: Tanay Samson Pathare (Bhonsala Military College)")
+    print("      Author: Tanay Pathare (Bhonsala Military College)")
     print("=" * 78)
     print(f"\n[QUERY SAMPLE #{sample_index}]")
     print(f"  * Ground Truth Label   : {ground_truth}")

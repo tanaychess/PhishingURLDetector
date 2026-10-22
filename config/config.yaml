@@ -1,13 +1,13 @@
 # Configuration for Phishing Detection & Explainability Framework
 # Research Project: Explainable Machine Learning Framework for Phishing Website Detection (XAI)
-# Author: Tanay Samson Pathare (Bhonsala Military College)
+# Author: Tanay Pathare (Bhonsala Military College)
 
 project:
   name: "PhishingURLDetector"
   title: "An Explainable Machine Learning Framework for Phishing Website Detection Using URL-Based Features"
   version: "1.0.0"
   random_seed: 42
-  author: "Tanay Samson Pathare"
+  author: "Tanay Pathare"
   institution: "Bhonsala Military College"
   email: "tanaypathare1@gmail.com"
 

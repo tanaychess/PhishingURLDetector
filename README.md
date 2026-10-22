@@ -1,6 +1,6 @@
 # An Explainable Machine Learning Framework for Phishing Website Detection Using URL-Based Features
 
-**Author**: Tanay Samson Pathare  
+**Author**: Tanay Pathare  
 **Affiliation**: Department of Computer Science, Bhonsala Military College, Nashik, Maharashtra, India  
 **Email**: [tanaypathare1@gmail.com](mailto:tanaypathare1@gmail.com)  
 
@@ -268,7 +268,7 @@ If you find this codebase or research useful in your work, please cite the manus
 
 ```bibtex
 @article{pathare2026phishingxai,
-  author    = {Tanay Samson Pathare},
+  author    = {Tanay Pathare},
   title     = {An Explainable Machine Learning Framework for Phishing Website Detection Using URL-Based Features},
   journal   = {Preprint},
   year      = {2026},
@@ -287,7 +287,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ## 9. Contact & Inquiries
 
 For questions, collaborations, or reproduction assistance:
-* **Tanay Samson Pathare**  
+* **Tanay Pathare**  
 * Department of Computer Science, Bhonsala Military College, Nashik, Maharashtra, India  
 * Email: [tanaypathare1@gmail.com](mailto:tanaypathare1@gmail.com)  
 * GitHub: [@tanaychess](https://github.com/tanaychess)

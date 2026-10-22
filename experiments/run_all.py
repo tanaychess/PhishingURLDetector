@@ -29,7 +29,7 @@ def run_master_pipeline():
     total_start = time.perf_counter()
     print("================================================================================")
     print("       STARTING COMPLETE EXPLAINABLE PHISHING RESEARCH PIPELINE")
-    print("       Author: Tanay Samson Pathare (Bhonsala Military College)")
+    print("       Author: Tanay Pathare (Bhonsala Military College)")
     print("================================================================================")
     
     config = load_config()
