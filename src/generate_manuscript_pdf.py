@@ -2,7 +2,7 @@
 Template-Compliant Scientific Manuscript PDF Generator.
 Generates paper/PhishingURLDetector.pdf adhering strictly to the new single-column
 journal/conference template with precise font specifications, running headers, and footers.
-Author: Tanay Samson Pathare (Department of Computer Science, Bhonsala Military College)
+Authors: Tanay Samson Pathare, Monali Hase (Department of Computer Science, Bhonsala Military College)
 
 Template Design Specifications:
 - Single Column Layout (A4, 54 pt margins, usable width = 487.27 pt).
@@ -364,7 +364,7 @@ def create_manuscript_pdf(output_pdf="paper/PhishingURLDetector.pdf"):
     story.append(Paragraph(title_text, title_style))
 
     # Authors: First Author, Second Author (12)
-    authors_text = "Tanay Samson Pathare<sup>1</sup>"
+    authors_text = "Tanay Samson Pathare<sup>1</sup>, Monali Hase<sup>1</sup>"
     story.append(Paragraph(authors_text, author_style))
 
     # Affiliation: 1(Department, College/ University Name, Country Name) (10 Italic)
@@ -1261,7 +1261,7 @@ def create_manuscript_pdf(output_pdf="paper/PhishingURLDetector.pdf"):
 
     story.append(Paragraph("Acknowledgment", sec_heading))
     story.append(Paragraph(
-        "The author acknowledges the Department of Computer Science, Bhonsala Military College, for providing research infrastructure and computational resources for this investigation.",
+        "The authors acknowledge the Department of Computer Science, Bhonsala Military College, for providing research infrastructure and computational resources for this investigation.",
         body_style
     ))
 
